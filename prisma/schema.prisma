@@ -1,0 +1,97 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// enum roles
+enum Role {
+  administrador
+  empleado
+  cliente
+}
+
+enum Type {
+  empleado
+  cliente
+}
+
+// model users
+model users {
+  id             Int              @id @default(autoincrement())
+  name           String           @db.VarChar(255)
+  last_name      String           @db.VarChar(255)
+  role           Role
+  phone          String           @db.VarChar(10)
+  email          String           @unique
+  password       String           @db.VarChar(255)
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @default(now())
+  deleted_at     DateTime?
+  users_shipping users_shipping[]
+}
+
+// model status
+model cat_status {
+  id         Int         @id @default(autoincrement())
+  status     String      @db.VarChar(255)
+  created_at DateTime    @default(now())
+  updated_at DateTime    @default(now())
+  deleted_at DateTime?
+  shippings  shippings[]
+}
+
+// model schedules
+model schedules {
+  id                  Int                   @id @default(autoincrement())
+  shipping_date       DateTime              @db.Date
+  hour                DateTime              @db.Time
+  created_at          DateTime              @default(now())
+  updated_at          DateTime              @default(now())
+  deleted_at          DateTime?
+  shippings_schedules shippings_schedules[]
+}
+
+// model shippings
+model shippings {
+  id                  Int                   @id @default(autoincrement())
+  follow_up           String                @db.VarChar(255)
+  recolection_address String                @db.VarChar(255)
+  delivery_address    String                @db.VarChar(255)
+  earnings            BigInt
+  comments            String                @db.Text
+  products            String                @db.VarChar(255)
+  status              cat_status            @relation(fields: [id_status], references: [id])
+  created_at          DateTime              @default(now())
+  updated_at          DateTime              @default(now())
+  deleted_at          DateTime?
+  id_status           Int
+  users_shipping      users_shipping[]
+  shippings_schedules shippings_schedules[]
+}
+
+// model relation users_shippings
+model users_shipping {
+  id          Int       @id @default(autoincrement())
+  users       users     @relation(fields: [user_id], references: [id])
+  shippings   shippings @relation(fields: [shipping_id], references: [id])
+  type_user   Type
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @default(now())
+  user_id     Int
+  shipping_id Int
+}
+
+// model relaton shippings_schedules
+model shippings_schedules {
+  id          Int       @id @default(autoincrement())
+  shippings   shippings @relation(fields: [shipping_id], references: [id])
+  schedules   schedules @relation(fields: [schedule_id], references: [id])
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @default(now())
+  shipping_id Int
+  schedule_id Int
+}

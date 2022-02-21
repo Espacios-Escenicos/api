@@ -1,0 +1,35 @@
+version: '3.9'
+services:
+#Servicio de MYSQL 
+  db_mysql:  
+    container_name: mysql_vencejos
+    image: mysql:5.7
+    restart: always 
+    ports:
+      - ${MYSQL_PORT}:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: vencejos
+    volumes:
+      - ./mysql:/var/lib/mysql:rw
+    networks:
+      - net_vencejos
+
+#servicio de NestJS
+  api:
+    container_name: api_vencejos
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - ${NEST_PORT}:3000
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - db_mysql
+    networks:
+      - net_vencejos
+
+networks:
+  net_vencejos:
