@@ -28,4 +28,19 @@ export class UsersService {
     });
     return user;
   }
+
+  async findUserByID(id: number) {
+    const user = await this.prisma.users.findUnique({ 
+      where: { id: id },
+    });
+    return user;
+  }
+  async deleteById(id: number) {
+    const user = await this.prisma.users.findFirst({ 
+      where: { id: id },
+    });
+    return user;
+  }
 }
+
+
